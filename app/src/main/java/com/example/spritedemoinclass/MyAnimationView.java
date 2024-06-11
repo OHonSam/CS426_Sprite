@@ -11,6 +11,7 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -36,7 +37,18 @@ public class MyAnimationView extends View {
     public MyAnimationView(Context context) {
         super(context);
         prepareContent();
-
+    }
+    public MyAnimationView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+        prepareContent();
+    }
+    public MyAnimationView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        prepareContent();
+    }
+    public MyAnimationView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+        prepareContent();
     }
 
     private void prepareContent() {
@@ -50,6 +62,7 @@ public class MyAnimationView extends View {
         timerTask = new TimerTask() {
             @Override
             public void run() {
+                //update each sprite
                 for (int i=0; i<sprites.size(); i++)
                     sprites.get(i).update();
                 postInvalidate();
@@ -61,31 +74,36 @@ public class MyAnimationView extends View {
     }
 
     private void CreateAngel(int left, int top) {
-        Bitmap[] bitmaps = new Bitmap[15];
-//        for (int i=0; i<bitmaps.length; i++)
-//            bitmaps[i] = BitmapFactory.decodeResource(getResources(), R.drawable.angel01+i);
-        bitmaps[0] = BitmapFactory.decodeResource(getResources(), R.drawable.angel01);
-        bitmaps[1] = BitmapFactory.decodeResource(getResources(), R.drawable.angel02);
-        bitmaps[2] = BitmapFactory.decodeResource(getResources(), R.drawable.angel03);
-        bitmaps[3] = BitmapFactory.decodeResource(getResources(), R.drawable.angel04);
-        bitmaps[4] = BitmapFactory.decodeResource(getResources(), R.drawable.angel05);
-        bitmaps[5] = BitmapFactory.decodeResource(getResources(), R.drawable.angel06);
-        bitmaps[6] = BitmapFactory.decodeResource(getResources(), R.drawable.angel07);
-        bitmaps[7] = BitmapFactory.decodeResource(getResources(), R.drawable.angel08);
-        bitmaps[8] = BitmapFactory.decodeResource(getResources(), R.drawable.angel09);
-        bitmaps[9] = BitmapFactory.decodeResource(getResources(), R.drawable.angel10);
-        bitmaps[10] = BitmapFactory.decodeResource(getResources(), R.drawable.angel11);
-        bitmaps[11] = BitmapFactory.decodeResource(getResources(), R.drawable.angel12);
-        bitmaps[12] = BitmapFactory.decodeResource(getResources(), R.drawable.angel13);
-        bitmaps[13] = BitmapFactory.decodeResource(getResources(), R.drawable.angel14);
-        bitmaps[14] = BitmapFactory.decodeResource(getResources(), R.drawable.angel15);
+        int[] angelResources = {
+                R.drawable.angel01,
+                R.drawable.angel02,
+                R.drawable.angel03,
+                R.drawable.angel04,
+                R.drawable.angel05,
+                R.drawable.angel06,
+                R.drawable.angel07,
+                R.drawable.angel08,
+                R.drawable.angel09,
+                R.drawable.angel10,
+                R.drawable.angel11,
+                R.drawable.angel12,
+                R.drawable.angel13,
+                R.drawable.angel14,
+                R.drawable.angel15
+        };
+        Bitmap[] bitmaps = new Bitmap[angelResources.length];
+        for (int i = 0; i < angelResources.length; i++) {
+            bitmaps[i] = BitmapFactory.decodeResource(getResources(), angelResources[i]);
+        }
         My2DSprite newSprite = new My2DSprite(bitmaps, left, top, 0, 0);
         sprites.add(newSprite);
     }
 
     private void CreateBuilding(int left, int top, int resID) {
         createSpriteWithASingleImage(left, top, resID);
-
+    }
+    private void CreateIsland(int left, int top, int resID) {
+        createSpriteWithASingleImage(left, top, resID);
     }
 
     private void createSpriteWithASingleImage(int left, int top, int resID) {
@@ -95,24 +113,7 @@ public class MyAnimationView extends View {
         sprites.add(newSprite);
     }
 
-    private void CreateIsland(int left, int top, int resID) {
-        createSpriteWithASingleImage(left, top, resID);
-    }
 
-    public MyAnimationView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        prepareContent();
-    }
-
-    public MyAnimationView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        prepareContent();
-    }
-
-    public MyAnimationView(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        prepareContent();
-    }
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -133,41 +134,55 @@ public class MyAnimationView extends View {
         switch (maskedAction) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_POINTER_DOWN: {
-                // TODO use data
-                tempIdx = getSelectedSpriteIndex(x, y);
-                if (tempIdx!=-1) {
-                    selectSprite(tempIdx);
-                    invalidate();
-                }
-                beginDrag(x, y);
-
+                handleActionDown(x, y);
                 break;
             }
             case MotionEvent.ACTION_MOVE: { // a pointer was moved
-                // TODO use data
-                processDrag(x, y);
-
+                handleActionMove(x, y);
                 break;
             }
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_POINTER_UP: {
-                endDrag(x, y);
-
+                handleActionUp(x, y);
                 break;
             }
             case MotionEvent.ACTION_CANCEL: {
-                // TODO use data
+                handleActionCancel();
                 break;
             }
         }
-
         return true;
 
     }
 
+    private void handleActionCancel() {
+        // TODO use data
+    }
+
+    private void handleActionUp(float x, float y) {
+        endDrag(x, y);
+    }
+
+    private void handleActionMove(float x, float y) {
+        // TODO use data
+        processDrag(x, y);
+//        My2DSprite sprite = sprites.get(selectedIndex);
+//        resizeSprite(sprite, 1.1F);
+    }
+
+    private void handleActionDown(float x, float y) {
+        // TODO use data
+        int tempIdx = getSelectedSpriteIndex(x, y);
+        if (tempIdx!=-1) {
+            selectSprite(tempIdx);
+            invalidate();
+        }
+        beginDrag(x, y);
+    }
+
     private void endDrag(float x, float y) {
         processDrag(x, y);
-        selectedIndex = -1;
+        selectedIndex = -1; // no sprite is currently being dragged
     }
 
     private void processDrag(float x, float y) {
@@ -196,11 +211,9 @@ public class MyAnimationView extends View {
             {
                 onSpriteClickListener.OnSpriteClick(this, x, y, selectedIndex);
             }
-            invalidate();
+            //invalidate();
         }
         else selectedIndex = -1;
-
-
     }
 
     private void selectSprite(int newIndex) {
@@ -219,4 +232,20 @@ public class MyAnimationView extends View {
 
         return -1;
     }
+//    private void randomizeSpritePosition(My2DSprite sprite) {
+//        Random random = new Random();
+//        sprite.left = random.nextInt(getWidth() - sprite.getWidth());
+//        sprite.top = random.nextInt(getHeight() - sprite.getHeight());
+//        postInvalidate();
+//    }
+    private void resizeSprite(My2DSprite sprite, float scaleFactor) {
+        for (int i = 0; i < sprite.BMPs.length; i++) {
+            sprite.BMPs[i] = Bitmap.createScaledBitmap(sprite.BMPs[i],
+                    (int)(sprite.BMPs[i].getWidth() * scaleFactor),
+                    (int)(sprite.BMPs[i].getHeight() * scaleFactor),
+                    true);
+        }
+        postInvalidate();
+    }
+
 }

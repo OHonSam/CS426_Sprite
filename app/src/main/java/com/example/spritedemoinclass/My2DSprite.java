@@ -8,11 +8,8 @@ public class My2DSprite {
     public int nBMPs;
     public int iBMP;
     public Bitmap[] BMPs;
-    public int left;
-    public int top;
-    public int width;
-    public int height;
-    public int State;
+    public int left, top, width, height;
+    public int State; // 0: unselected, 1: selected
 
     public My2DSprite(Bitmap[] bmps, int left, int top, int width, int height)
     {
@@ -56,5 +53,12 @@ public class My2DSprite {
 
     public boolean isSelected(float x, float y) {
         return (x>=left && x < left+width && y>=top && y <top+height);
+    }
+
+    public int getWidth() {
+        return width;
+    }
+    public int getHeight() {
+        return height;
     }
 }
